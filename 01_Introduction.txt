@@ -1,0 +1,61 @@
+// Container: the main thing in docker.
+
+// Docker container.
+
+// Docker container image is a lightweight, standalone executable package of software that includes everything needed to run an application.
+
+// os dependencies, runtime dependencies
+
+// section 1 to 4 are for understanding why containers exist in the first place, the problems that they solve and the underlying Linux kernel features that make Docker and containers possible.
+
+// minimal three-tier web application demo application meaning it has a front end, an API layer in two implementations, first using node.js and second using golang for showing how different languages are handled with containers and also postgre database.
+
+// in deployment phase we'll learn how to deploy our containerized application to the cloud.
+
+// we'll also use Docker swarm which is container orchestrator built into Docker.
+
+// two bonus videos to highlight additional methods of deploying containers one using Railway and second using Kubernetes.
+
+// deploying containerized applications.
+
+// single standardized package as long as my server has a container runtime.
+
+// all you need to do is take this standard container image and run it with these specific options and that's it. don't worry about underlying operating system and dependencies. as long as we have our system and a container runtime and our container image we can run our server and get repeatably reliable results and this is the reason why containers exist.
+
+// let's say I am writing an app in python, the python runtime with all its libraries etc. like mypy etc. and also the code that we write in this application all of this gets bundled into this container image and we can make multiple copies of it and run them all. 
+
+// container image is all dependencies code etc. and container is what we run from that image. Container image is like the class in object oriented proramming and container that we'll actually run from that container image is like the instance that we make from that class.
+
+// Open Container Initiative (OCI): // Industry standards around container formats (what a container is) and runtimes (how it should be run).
+
+    // Runtime Specification: how you would take an image and run it in a container.
+    // Image Specification: what should be included in container image.
+    // Distribution Specification: How those images should be distributed // Registeries, pushing and pulling images.
+
+// History:
+
+    // 1st we had bare metal computers means physical computers 
+    // 2nd we evolved to virtual machines.
+    // and then 3rd we got to the world of containers.
+
+// container runtime is analogous to hypervisor. Container runtime is a piece of software that knows how to take a container image and run it within the host system.
+
+// The key difference between virtual machines and containers is that virtual machines are running their own copy of the Linux kernel. Linux containers and windows containers are different topics in this course we are talking about Linux containers. Linux containers share the kernel with the host operating system versus in a virtual machine you have your own kernel and you have a copy of your own operating system that's running. We won't get that level of isolation between different containers that we would in a virtual machine but we still can get quite good isolation between containers if we configure things properly. We run different containers on same host, however they are still isolated and have their own copies of binaries and libraries even though these containers are sharing that underlying kernel.
+
+// Docker and Podman are in the category of desktop container plartforms and they are container management systems. We'll install them on our development systems to manage containers, manage container images and run containers and set up the necessary networking etc.
+
+// Linux is the kernel: the program in the system that allocates the machine's resources to the other programs that you run. The kernel is an essential part of an operating system, but useless by itself; it can only function in the context of a complete operating system.
+
+// Linux is the kernel not a whole operating system, one of the essential major components of the system. The system as a whole is basically the GNU system, with Linux added.
+
+// Orchestrators: 
+
+    // Orchestrators are designed specifically to take containers and run and manage and schedule them accross multiple nodes and in this case node is each of those virtual machines on which we are running containers like in the example in which we have a host system and on that we setup multiple virtual machines and on each of those virtual machines we are running containers and for managing them these orchestrators like Kubernets, nomad and docker swarm etc. are.
+
+    // Examples:
+
+        // Docker swarm
+        // Kubernetes
+        // Nomad (from Hashicorp maybe)
+
+        

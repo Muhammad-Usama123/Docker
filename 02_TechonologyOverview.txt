@@ -1,0 +1,11 @@
+// Technology deep dive
+
+// Understand the foundational Linux kernel features that software like Docker is using to make containers.
+
+// Docker system architecture at the end of this part.
+
+Techonologies that make up the core of a container:
+
+    // Namespaces
+    // Control Groups (cgroups)
+    // Union Filesystem
