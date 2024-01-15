@@ -1,0 +1,66 @@
+// By default any changes or modification we do inside a container during runtime is ephemeral(aarzi) and will get deleted when we stop and maybe delete the container.So if you want things to persist everytime we run the container from container image, then we can do 2 things one is we can do things in the build process that we want to persist and 2nd is Docker Volumes and Bind mount.
+
+// Docker Volumes:
+
+    like if a user changes some details in its profile on our web and we want them to get stored somewhere so whenever we run that container again we can access those changes. Docker volumes path is inside the Docker Linux virtual machine.
+
+// Bind mount:
+
+    // its path will be in our main host system which we use docker on but the data will still get stored on Docker volumes. By defualt Docker volume is suggested by Docker for performance. Any changes that we do in our files in this bind mount path, they will be shown on our main host machine our system. If we want easy observability of the files and we want to see the files that are created during runtime more easily then bind mount is a good option.
+
+experiment:
+
+    // "docker run --interactive --tty --rm ubuntu:22.04" // this command will run a container with ubuntu version 22.04 installed in it.
+
+    // --interactive and --tty these two flags together means we'll get a running shell within that container. The --rm flag tells Docker that once this container process exits so once we exit the container it should not store that stopped container, it should actually remove that from our system.
+
+    // "ping google.com -c 1" // we are pinging google.com through this "ping" command and "-c 1" flag represents that we want to ping 1 time but the shell says ping command not found so it means that it doesn't installed with that ubuntu image in our container that we talked about in line 13 above so to install it we can use the APT package manager and the two steps commands are:
+
+    // "apt update" this command will fetch all the metadata associated with APT package manager.
+
+    // "apt install iputils-ping"
+
+    // "docker run --interactive --tty --rm ubuntu:22.04" now we are running a new container from that same ubuntu container image again that we created above now the container id will be different cause we told in the command to remove that container completely when we'll exit that container so now we'll get different container id this time after running a container from that same ubuntu container image that we created above in line 13 and when we'll use "ping" command in this new container it will again say ping command not found like said in previous container cause whatever we do inside container during runtime doesn't gets saved and the solution for this we already discussed above like docker volume etc.. 
+
+// experiment 2:
+
+    "docker run --interactive --tty --name my-ubuntu-container ubuntu:22.04" in this command we removed the --rm flag so Docker will not remove the container after we stop this container and we also used --name flag for maybe giving name to our container which is in this case maybe "my-ubuntu-container" and after running this command we'll get a shell inside that container because we used "--interactive" and "--tty" flag.
+
+    // 2 steps for installing ping utility inside our container:
+
+        // "apt update" command
+        // "apt install iputils-ping" command if we'll also use --yes flag with this command at the end, then it will not ask for yes or no.
+
+    // "ping google.com -c 1" command for pinging google.com 1 time.
+
+    // "exit" command for exiting the container and because in this experiment we didn't use --rm flag so this container will still exist on our system means it doesn't get removed from our system after we exit from this container.
+
+    "docker ps" command for seeing the list of available containers that are currently running.
+
+    "docker ps -a" command for seeing the list of all available containers on our system. After running this command we'll see our this container that we just exited from with the name of "my-ubuntu-container" cause we gave this name to our container by using "--name" flag when we were starting running our this container.
+
+    // now this container even though it is in stop state, it still have that read write layer inside it.
+
+    // "docker start my-ubuntu-container" it will restart our container named my-ubuntu-container.
+    // "docker attach my-ubuntu-container" to attach to the shell running inside that container.
+    // "ping google.com -c 1" now this ping command was available.
+
+// Writing a simple Docker file and pass it at the command line And Build a container image with ubuntu image as base and ping installed: (the case of data that we know about at build time and can build into the image directly)
+
+    // "docker build --tag my-ubuntu-image -<<EOF FROM ubuntu:22.04
+    RUN apt update && apt install iputils-ping --yes EOF" this command is not working on windows and chatgpt is saying that it doesn't run on windows and chatgpt is showing us a different approach the command that chatgpt recommended and this command is working on my system is as follows:
+
+        // "echo FROM ubuntu:22.04 > Dockerfile && echo RUN apt update ^&^& apt install iputils-ping --yes >> Dockerfile && docker build --tag my-ubuntu-image ."
+
+    // "docker run -it --rm my-ubuntu-image" for running a container based on new image that we created using line 53.
+
+
+
+
+
+
+
+
+
+
+
