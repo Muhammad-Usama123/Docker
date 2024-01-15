@@ -21,3 +21,9 @@ Techonologies that make up the core of a container:
 // Docker desktop
 
 // Docker engine: // Docker engine is the open source core of docker. Docker CLI(Command Line Interface), Docker Daemon and Docker API makes up Docker engine.
+
+// After installing Docker app we can run Docker commands in our command prompt.
+
+// by writing docker inside command prompt after docker installation and press enter, we can see probably all the available commands with what they do inside command prompt.
+
+// Installing Docker application gave us both Docker CLI and Docker Daemon in our system command prompt and system.
