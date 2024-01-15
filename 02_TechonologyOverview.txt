@@ -8,4 +8,16 @@ Techonologies that make up the core of a container:
 
     // Namespaces
     // Control Groups (cgroups)
-    // Union Filesystem
+    // Union Filesystem (overlay Filesystem) // because of this we are able to share lower layer and cache those layers such that the amount of data that needs to be transferred and stored is much much smaller because many images can share a common lower layer and then only some subset of the upper layers can be modified which enables us to move less data when we need to get a container image onto a system and allocate less space if we're running multiple copies of the same container.
+
+// When we install Docker desktop in our system it also creates a Linux virtual machine on our system like if I'm on macOS there's no such thing as macOS container instead Docker uses a hypervisor, installs a Linux virtual machine on our system.
+
+// Docker daemon manages container objects as well as things like networking and volumes all within this server host application. Whatever command we issue from our host system it gets passed to Docker Daemon which is listening via Docker API.
+
+// Registry is a place to store, share container images. It is not a part of Docker desktop. Docker hub for registry.
+
+// Docker
+
+// Docker desktop
+
+// Docker engine: // Docker engine is the open source core of docker. Docker CLI(Command Line Interface), Docker Daemon and Docker API makes up Docker engine.
