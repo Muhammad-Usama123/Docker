@@ -45,14 +45,115 @@ experiment:
     // "docker attach my-ubuntu-container" to attach to the shell running inside that container.
     // "ping google.com -c 1" now this ping command was available.
 
-// Writing a simple Docker file and pass it at the command line And Build a container image with ubuntu image as base and ping installed: (the case of data that we know about at build time and can build into the image directly)
+// 1st use case of storing data where we know about the data at build time:
 
-    // "docker build --tag my-ubuntu-image -<<EOF FROM ubuntu:22.04
+    // Writing a simple Docker file and pass it at the command line And Build a container image with ubuntu image as base and ping installed: (the case of data that we know about at build time and can build into the image directly)
+
+        // "docker build --tag my-ubuntu-image -<<EOF FROM ubuntu:22.04
     RUN apt update && apt install iputils-ping --yes EOF" this command is not working on windows and chatgpt is saying that it doesn't run on windows and chatgpt is showing us a different approach the command that chatgpt recommended and this command is working on my system is as follows:
 
-        // "echo FROM ubuntu:22.04 > Dockerfile && echo RUN apt update ^&^& apt install iputils-ping --yes >> Dockerfile && docker build --tag my-ubuntu-image ."
+            // "echo FROM ubuntu:22.04 > Dockerfile && echo RUN apt update ^&^& apt install iputils-ping --yes >> Dockerfile && docker build --tag my-ubuntu-image ."
 
-    // "docker run -it --rm my-ubuntu-image" for running a container based on new image that we created using line 53.
+        // "docker run -it --rm my-ubuntu-image" for running a container based on new image that we created using line 53.
+
+        // so I hope the above experiments gave a better idea of how this container file system works. 
+
+// 2nd use case of storing data where we don't know about the data at build time means in this case data will be produced by the container(application) at runtime and we want to store that data. Volume concept maybe:
+
+    // This could be data that's going into a database.
+
+    // "docker run -it --rm ubuntu:22.04" creating a container from that ubuntu image that we already created above. Shortened the "--interactive" and "--tty" flags with "-it" flag, this "-it" flag will do the same work as "--interactive" and "--tty" flags maybe this "-it" flag is the short form of these two flags.
+
+    // "mkdir my-data" for making a directory inside our container with the name of my-data, to simulate(storing) the data that will be created at runtime.
+
+    // "echo "abc from the container!" > /my-data/abc.txt" for echoing "abc from the container!" into a file within the directory that we created above in line 67.
+
+    // "cat my-data/abc.txt" it will show us the text that we wrote in above command in quotes in line 69 that is stored in a file on the container file system.
+
+    // "exit" for exiting (maybe stopping) the container.
+
+    // "docker run -it --rm ubuntu:22.04" running a new container from same ubuntu image.
+
+    // "cat my-data/abc.txt" we'll see "No such file or directory" in command prompt in return. Means our data didn't get stored and the directory "my-data" and the file "abc.txt" that we created inside the directory "my-data" doesn't exist.
+
+    // "exit" for exiting the container.
+
+    // Now we'll use volume:
+
+        // "docker volume create my-volume" for creating volume.
+
+        // "docker run -it --rm --mount source=my-volume,destination=/my-data/ ubuntu:22.04" for running a new container with the same image and also we mounted the volume into the file system of this container.
+
+        // "mkdir my-data" for making a directory inside this running container but command prompt will return this time that "file exists" in this case because we mounted the volume in above command at line 85 and provided the destination as my-data at line 85.
+
+        // "echo "abc from the container!" > /my-data/abc.txt" // for echoing "abc from the container!" in the file abc.txt which will be created inside my-data directory in our this running container.
+
+        // "cat my-data/abc.txt" // command prompt will print "abc from the container!" in return.
+
+        // "exit" // for exiting or stopping this running container.
+
+        // "docker run -it --rm --mount source=my-volume,destination=/my-data/ ubuntu:22.04" // for recreating a new container from same ubuntu image and also mounting the same volume like in line 85.
+
+        // "ls" command for seeing all the directories inside our this newly created container that we created above at line 95.
+
+        // "cd my-data/" for going inside my-data directory in this running container.
+
+        // "ls" for seeing all files available inside this my-data directory. Command prompt will print abc.txt in return and this is the file that we created at line 89.
+
+        // "cat my-data/abc.txt" command prompt will print "abc from the container!" in return.
+
+        // the volume file lives in the virtual machine file system that Docker is managing in the case of macOS and maybe in case of windows too, but in case of Linux it maybe lives in our physical Linux machine at var/lib/docker/volumes.
+
+// trick to run our main docker virtual machine previlidged container and access its shell and see our saved volume files inside that virtual machine:
+
+    // # Create a container that can access the Docker Linux VM
+    // # Pinning to the image hash ensures it is this SPECIFIC image and not an updated one helps minimize the potential of a supply chain attack
+    // docker run -it --rm --privileged --pid=host justincormack/nsenter1@sha256:5af0be5e42ebd55eea2c593e4622f810065c3f45bb805eaacf43f08f3d06ffd8
+
+    // # Navigate to the volume inside the VM at:
+    // ls /var/lib/docker/volumes/my-volume/_data
+    // cat /var/lib/docker/volumes/my-volume/_data/abc.txt # Woohoo! we found our data!
+
+// Bind Mount example for the same usecase as we use in volume mount above at line 61:
+
+    // # Create a container that mounts a directory from the host filesystem into the container:
+
+    // "docker run  -it --rm --mount type=bind,source="${PWD}"/my-data,destination=/my-data ubuntu:22.04" // "source="${PWD}""  "${PWD}" means present working directory.
+
+    // # Again, there is a similar (but shorter) syntax using -v which accomplishes the same
+
+    // docker run  -it --rm -v ${PWD}/my-data:/my-data ubuntu:22.04
+
+    // echo "abc from the container!" > /my-data/abc.txt
+
+    // # You should also be able to see the abc.txt file on your host system:
+
+    // cat my-data/abc.txt
+
+    // exit
+
+    // "rm my-data/abc.txt" if we want to remove abc.txt from inside my-data directory. // just for remebering command for removing file.
+
+    // "cat my-data/abc.txt" if I run this command again after exiting the above container, we'll still see "abc from the container" cause we used bind mount this time and bind mount stores data in our main system. If we modify things that are saved in our bind mount file after exiting the container, then if we run a new container with that bind mount file again then we'll able to see the changes in the new container too.
+
+    // "vi my-data/abc.txt" for editing the data inside the mount file.
+
+// specific use cases for leveraging third party containers like what things or files maybe or env variables etc. ect. we can need in case of database containers etc etc. directly are in github repo of this course. Details are in github repo:
+
+    // guidance for setting up database containers 
+
+    // environemnts for interactive testing like if I am on windows and I want to test some linux commands in our command prompt or we want programming runtime environment like if we want to test a python code so we can activate python environment with any available version in the command prompt and test the code in command prompt.
+
+    // command line (CLI) utilities.
+
+// we can make and run shell functions inside command prompt if we don't want to use different commands again and again.
+
+// we can also use alias instead of shell functions to do the same thing that we have written in line 149 above.
+
+// Willy Wonka of Containers - Jessie Frazelle (early adopter of Docker and employee of Docker and used to do all sort of things in Docker) // We can see her video with this title which is maybe worth watching that shows that we can run pretty much everything in containers.
+
+// completed the first portion of course. Now we can start building our own containerized applications.
+
 
 
 
